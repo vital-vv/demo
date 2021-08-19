@@ -1,4 +1,4 @@
-### StateMachine demo
+### Kafka & StateMachine demo
 
 ##### Build
 

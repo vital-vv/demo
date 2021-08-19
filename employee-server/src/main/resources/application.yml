@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: employee-server
+
+  datasource:
+    url: ${DEMO_DB_URL:jdbc:postgresql://localhost:5432/demo}
+    username: ${DEMO_DB_USER:user}
+    password: ${DEMO_DB_PASS:pass}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    show-sql: true
+    generate-ddl: true
+    properties.hibernate:
+      dialect: org.hibernate.dialect.PostgreSQL95Dialect
+
+  cloud:
+    stream:
+      function:
+        definition: supplier;consumer
+      bindings:
+        supplier-out-0:
+          destination: employee-topic
+          producer:
+            useNativeEncoding: true
+        consumer-in-0:
+          destination: update-employee-topic
+          consumer:
+            useNativeDecoding: true
+      kafka:
+        binder:
+          brokers: ${BROKER:localhost}
+        bindings:
+          supplier-out-0:
+            producer:
+              configuration:
+                schema.registry.url: ${spring.cloud.schema-registry-client.endpoint}
+                value.serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+          consumer-in-0:
+            consumer:
+              configuration:
+                schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
+                value.deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+                specific.avro.reader: true
+
+    schema-registry-client:
+      endpoint: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
+
+    schema:
+      avro:
+        schema-locations: classpath:employee.avsc
+        subject-name-prefix: employee-topic-value
+        subject-naming-strategy: org.springframework.cloud.schema.registry.avro.SubjectPrefixOnlyNamingStrategy
+
+springdoc:
+  api-docs:
+    path: /api-docs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+logging.level:
+  com.example.demo: DEBUG

@@ -1,0 +1,48 @@
+{
+  "namespace": "com.example.avro",
+  "type": "record",
+  "name": "EmployeeAvro",
+  "fields": [
+    {
+      "name": "id",
+      "type": "long"
+    },
+    {
+      "name": "machineId",
+      "type": "string"
+    },
+    {
+      "name": "state",
+      "type": [
+        "null",
+        {
+          "name": "State",
+          "type": "enum",
+          "symbols": [
+            "ADDED",
+            "IN_CHECK",
+            "APPROVED",
+            "ACTIVE"
+          ]
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "event",
+      "type": [
+        "null",
+        {
+          "name": "Event",
+          "type": "enum",
+          "symbols": [
+            "TO_CHECK",
+            "APPROVE",
+            "ACTIVATE"
+          ]
+        }
+      ],
+      "default": null
+    }
+  ]
+}

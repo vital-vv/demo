@@ -1,0 +1,86 @@
+plugins {
+  id 'com.github.davidmc24.gradle.plugin.avro'
+  id 'org.springframework.boot'
+  id 'io.spring.dependency-management'
+  id 'com.palantir.docker'
+  id 'jacoco'
+  id 'java'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
+}
+
+sourceSets {
+  main.resources.srcDirs += "src/main/avro"
+}
+
+repositories {
+  mavenCentral()
+  maven { url "https://packages.confluent.io/maven/" }
+}
+
+dependencies {
+  annotationProcessor(
+      'org.projectlombok:lombok',
+      "org.mapstruct:mapstruct-processor:$mapstructVersion"
+  )
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-validation'
+  implementation "org.springframework.cloud:spring-cloud-stream"
+  implementation "org.springframework.cloud:spring-cloud-stream-binder-kafka"
+  implementation "org.springframework.cloud:spring-cloud-schema-registry-client"
+  implementation "io.confluent:kafka-schema-registry-client:$confluentVersion"
+  implementation "io.confluent:kafka-avro-serializer:$confluentVersion"
+  implementation "org.springdoc:springdoc-openapi-ui:$springdocOpenapiVersion"
+  implementation "org.postgresql:postgresql:$postgresqlVersion"
+  implementation "org.mapstruct:mapstruct:$mapstructVersion"
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation "org.testcontainers:testcontainers"
+  testImplementation "org.testcontainers:postgresql"
+}
+
+dependencyManagement {
+  imports {
+    mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
+  }
+}
+
+test {
+  useJUnitPlatform()
+}
+
+avro {
+  createSetters = false
+}
+
+jacocoTestReport {
+  dependsOn test
+}
+
+jacocoTestCoverageVerification {
+  violationRules {
+    rule {
+      limit {
+        minimum = 0.8
+      }
+    }
+  }
+}
+
+docker {
+  name 'demo/employee-server'
+  dockerfile rootProject.file('docker/Dockerfile')
+  files tasks.bootJar.outputs.files.singleFile
+  buildArgs JAR_FILE: bootJar.archiveFileName.get()
+  dependsOn bootJar
+}

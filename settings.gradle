@@ -1,0 +1,20 @@
+pluginManagement {
+  plugins {
+    id 'com.github.davidmc24.gradle.plugin.avro' version '1.2.1'
+    id 'org.springframework.boot' version '2.5.3'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'com.palantir.docker' version '0.26.0'
+  }
+}
+
+fileTree('.') {
+  include '**/build.gradle'
+  exclude '**/build'
+  exclude '**/docker'
+  exclude '**/node_modules'
+  exclude 'build.gradle' // Exclude the root build file.
+  exclude '.gradle'
+  exclude '.idea'
+}.collect {
+  relativePath(it.parent).replace(File.separator, ':')
+}.each { include(it) }

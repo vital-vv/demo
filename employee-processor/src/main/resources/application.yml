@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: employee-processor
+
+  datasource:
+    url: ${DEMO_DB_URL:jdbc:postgresql://localhost:5432/demo}
+    username: ${DEMO_DB_USER:user}
+    password: ${DEMO_DB_PASS:pass}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    show-sql: true
+    generate-ddl: true
+    properties.hibernate:
+      dialect: org.hibernate.dialect.PostgreSQL95Dialect
+
+  cloud:
+    stream:
+      bindings:
+        process-in-0:
+          destination: employee-topic
+          consumer:
+            useNativeDecoding: true
+        process-out-0:
+          destination: update-employee-topic
+          producer:
+            useNativeEncoding: true
+      kafka:
+        binder:
+          brokers: ${BROKER:localhost}
+        bindings:
+          process-in-0:
+            consumer:
+              configuration:
+                schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
+                value.deserializer: io.confluent.kafka.serializers.KafkaAvroDeserializer
+                specific.avro.reader: true
+          process-out-0:
+            producer:
+              configuration:
+                schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8081}
+                value.serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+logging.level:
+  com.example.demo: DEBUG
+
+server:
+  port: 8082
