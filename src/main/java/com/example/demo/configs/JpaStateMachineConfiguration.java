@@ -1,7 +1,7 @@
-package com.example.demo.config;
+package com.example.demo.configs;
 
-import com.example.demo.emploee.model.EmployeeEvent;
-import com.example.demo.emploee.model.EmployeeState;
+import com.example.demo.model.EmployeeEvent;
+import com.example.demo.model.EmployeeState;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.statemachine.data.jpa.JpaPersistingStateMachineInterceptor;

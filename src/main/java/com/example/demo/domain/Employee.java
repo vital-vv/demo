@@ -1,6 +1,6 @@
-package com.example.demo.emploee.domain;
+package com.example.demo.domain;
 
-import com.example.demo.emploee.model.EmployeeState;
+import com.example.demo.model.EmployeeState;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,7 +35,7 @@ public class Employee extends BaseEntity {
   private String contractNumber;
 
   @NotNull
-  @Column(nullable = false, columnDefinition = "varchar(255) default 'ADDED'")
+  @Column(nullable = false)
   @Enumerated(EnumType.STRING)
   private EmployeeState state = EmployeeState.ADDED;
 

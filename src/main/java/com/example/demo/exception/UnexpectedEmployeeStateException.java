@@ -1,6 +1,6 @@
 package com.example.demo.exception;
 
-import com.example.demo.emploee.model.EmployeeEvent;
+import com.example.demo.model.EmployeeEvent;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 

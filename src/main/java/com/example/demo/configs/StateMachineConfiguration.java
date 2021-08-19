@@ -1,8 +1,8 @@
-package com.example.demo.config;
+package com.example.demo.configs;
 
-import com.example.demo.emploee.domain.Employee;
-import com.example.demo.emploee.model.EmployeeEvent;
-import com.example.demo.emploee.model.EmployeeState;
+import com.example.demo.domain.Employee;
+import com.example.demo.model.EmployeeEvent;
+import com.example.demo.model.EmployeeState;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -119,7 +119,7 @@ public class StateMachineConfiguration extends EnumStateMachineConfigurerAdapter
     return new StateMachineListenerAdapter<>() {
       @Override
       public void stateChanged(State<EmployeeState, EmployeeEvent> from, State<EmployeeState, EmployeeEvent> to) {
-        log.debug("Statemachine state haas been changed from {} to {}", from, to);
+        log.debug("Statemachine state has been changed from {} to {}", from, to);
       }
     };
   }

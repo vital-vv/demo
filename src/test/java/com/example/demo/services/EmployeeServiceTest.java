@@ -1,16 +1,22 @@
-package com.example.demo.web;
+package com.example.demo.services;
 
-import com.example.demo.emploee.EmployeeRepository;
-import com.example.demo.emploee.domain.Employee;
-import com.example.demo.emploee.model.EmployeeEvent;
-import com.example.demo.emploee.model.EmployeeState;
+import com.example.demo.EmployeeCreatePayloads;
+import com.example.demo.RandomObjects;
+import com.example.demo.domain.Employee;
+import com.example.demo.domain.repo.EmployeeRepository;
 import com.example.demo.exception.EmployeeNotFoundException;
 import com.example.demo.exception.UnexpectedEmployeeStateException;
-import com.example.demo.web.model.CreateEmployeePayload;
+import com.example.demo.model.EmployeeEvent;
+import com.example.demo.model.EmployeeState;
+import com.example.demo.model.dto.EmployeeCreatePayload;
+import com.example.demo.model.dto.EmployeePayload;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -20,6 +26,8 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("testcontainers")
+@Transactional
+@Rollback
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class EmployeeServiceTest {
 
@@ -28,15 +36,22 @@ class EmployeeServiceTest {
   @Autowired
   private EmployeeRepository repo;
 
+  private List<Employee> employees;
+
+  @BeforeEach
+  void setUp() {
+    employees = Stream.generate(RandomObjects::employee)
+        .limit(10)
+        .collect(Collectors.toList());
+    employees = repo.saveAll(employees);
+  }
+
   @Test
   void testCreateEmployee() {
-    final CreateEmployeePayload employeePayload = CreateEmployeePayload.of("John", "Smith", Instant.now());
-    final Employee employee = service.create(employeePayload);
+    final EmployeeCreatePayload employeePayload = EmployeeCreatePayloads.of("John", "Smith", Instant.now());
+    final EmployeePayload employee = service.create(employeePayload);
 
     assertNotNull(employee.getId());
-    assertNotNull(employee.getVersion());
-    assertNotNull(employee.getCreatedOn());
-    assertNotNull(employee.getUpdatedOn());
     assertEquals("John", employee.getName());
     assertEquals("Smith", employee.getSurname());
     assertEquals(EmployeeState.ADDED, employee.getState());
@@ -44,15 +59,38 @@ class EmployeeServiceTest {
   }
 
   @Test
-  void testEmployeeEvents() {
-    final List<Long> ids = Stream.of(
-            CreateEmployeePayload.of("John", "Smith"),
-            CreateEmployeePayload.of("Jane", "Fox", Instant.now()),
-            CreateEmployeePayload.of("Max", "Paine", Instant.now()))
-        .map(service::create)
-        .map(Employee::getId)
-        .collect(Collectors.toList());
+  void testGetEmployeeById() {
     final Long missingEmployeeId = -1L;
+    final Employee expected = employees.get(0);
+    final EmployeePayload actual = service.getById(expected.getId());
+
+    assertEquals(expected.getId(), actual.getId());
+    assertEquals(expected.getName(), actual.getName());
+    assertEquals(expected.getSurname(), actual.getSurname());
+    assertEquals(expected.getBirthDate(), actual.getBirthDate());
+    assertEquals(expected.getWorkPhone(), actual.getWorkPhone());
+    assertEquals(expected.getPersonalPhone(), actual.getPersonalPhone());
+    assertEquals(expected.getContractNumber(), actual.getContractNumber());
+    assertEquals(expected.getState(), actual.getState());
+
+    assertThrows(EmployeeNotFoundException.class, () -> service.getById(missingEmployeeId));
+  }
+
+  @Test
+  void testGetAll() {
+    assertEquals(employees.size(), service.getAll().size());
+  }
+
+  @Test
+  void testEmployeeEvents() {
+    final Long missingEmployeeId = -1L;
+    final List<Long> ids = Stream.of(
+            EmployeeCreatePayloads.of("John", "Smith"),
+            EmployeeCreatePayloads.of("Jane", "Fox", Instant.now()),
+            EmployeeCreatePayloads.of("Max", "Paine", Instant.now()))
+        .map(service::create)
+        .map(EmployeePayload::getId)
+        .collect(Collectors.toList());
 
     for (Long id : ids) {
       service.manage(id, EmployeeEvent.TO_CHECK);
