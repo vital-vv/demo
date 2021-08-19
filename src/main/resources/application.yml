@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: demo-app
+
+  datasource:
+    url: ${DEMO_DB_URL:jdbc:postgresql://localhost:5432/demo}
+    username: ${DEMO_DB_USER:user}
+    password: ${DEMO_DB_PASS:pass}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    show-sql: true
+    generate-ddl: true
+    properties.hibernate:
+      dialect: org.hibernate.dialect.PostgreSQL95Dialect
+
+springdoc:
+  api-docs:
+    path: /api-docs
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+logging.level:
+  com.example.demo: DEBUG

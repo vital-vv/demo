@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  demo-store:
+    image: postgres:alpine
+    restart: unless-stopped
+    volumes:
+      - app_pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: demo
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+
+  demo-app:
+    image: demo/demo-app
+    restart: unless-stopped
+    depends_on:
+      - demo-store
+    ports:
+      - "8080:8080"
+    environment:
+      DEMO_DB_URL: jdbc:postgresql://demo-store:5432/demo
+      DEMO_DB_USER: user
+      DEMO_DB_PASS: pass
+
+volumes:
+  app_pgdata:
