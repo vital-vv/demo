@@ -1,15 +1,15 @@
 package com.example.demo.processor.services;
 
-import com.example.avro.EmployeeAvro;
-import com.example.avro.Event;
+import com.example.avro.Action;
+import com.example.avro.EmployeeEvent;
 import com.example.avro.State;
 import org.springframework.statemachine.StateMachine;
 
 public interface StateMachineHelper {
 
-  StateMachine<State, Event> createMachine(EmployeeAvro employee);
+  StateMachine<State, Action> createMachine(EmployeeEvent employee);
 
-  StateMachine<State, Event> getMachine(EmployeeAvro employee);
+  StateMachine<State, Action> getMachine(EmployeeEvent employee);
 
-  EmployeeAvro saveMachine(StateMachine<State, Event> machine);
+  EmployeeEvent saveMachine(StateMachine<State, Action> machine);
 }

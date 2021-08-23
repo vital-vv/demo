@@ -22,6 +22,8 @@ services:
     ports:
       - "8080:8080"
     environment:
+      BROKER: broker:29092
+      SCHEMA_REGISTRY_URL: http://schema-registry:8081
       DEMO_DB_URL: jdbc:postgresql://demo-store:5432/demo
       DEMO_DB_USER: user
       DEMO_DB_PASS: pass
@@ -32,9 +34,9 @@ services:
     depends_on:
       - broker
       - demo-store
-    ports:
-      - "8082:8080"
     environment:
+      BROKER: broker:29092
+      SCHEMA_REGISTRY_URL: http://schema-registry:8081
       DEMO_DB_URL: jdbc:postgresql://demo-store:5432/demo
       DEMO_DB_USER: user
       DEMO_DB_PASS: pass

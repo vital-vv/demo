@@ -1,14 +1,14 @@
 package com.example.demo.server.services.impl;
 
+import com.example.avro.Action;
 import com.example.demo.server.domain.Employee;
 import com.example.demo.server.domain.repo.EmployeeRepository;
 import com.example.demo.server.exception.EmployeeNotFoundException;
 import com.example.demo.server.mapper.EmployeeMapper;
-import com.example.demo.server.model.EmployeeEvent;
-import com.example.demo.server.model.dto.EmployeeCreatePayload;
-import com.example.demo.server.model.dto.EmployeePayload;
+import com.example.demo.server.model.EmployeeCreatePayload;
+import com.example.demo.server.model.EmployeePayload;
+import com.example.demo.server.services.EmployeeEventSource;
 import com.example.demo.server.services.EmployeeService;
-import com.example.demo.server.services.EmployeeSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   private final EmployeeMapper mapper;
   private final EmployeeRepository repository;
-  private final EmployeeSource employeeSource;
+  private final EmployeeEventSource employeeEventSource;
 
   @Override
   public EmployeePayload create(EmployeeCreatePayload employeePayload) {
@@ -33,7 +33,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     Employee employee = mapper.map(employeePayload);
     employee = repository.save(employee);
 
-    employeeSource.sendEmployee(employee);
+    employeeEventSource.send(employee);
 
     return mapper.map(employee);
   }
@@ -57,11 +57,11 @@ public class EmployeeServiceImpl implements EmployeeService {
   }
 
   @Override
-  public void manage(Long employeeId, EmployeeEvent event) {
-    log.debug("Updating state of the employee with id: {}. Event: {}", employeeId, event);
+  public void manage(Long employeeId, Action action) {
+    log.debug("Updating state of the employee with id: {}. Event: {}", employeeId, action);
     Employee employee = repository.findById(employeeId)
         .orElseThrow(() -> new EmployeeNotFoundException(employeeId));
 
-    employeeSource.sendEmployee(employee, event);
+    employeeEventSource.send(employee, action);
   }
 }

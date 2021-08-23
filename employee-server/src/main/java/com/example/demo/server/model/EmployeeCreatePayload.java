@@ -1,16 +1,15 @@
-package com.example.demo.server.model.dto;
+package com.example.demo.server.model;
 
-import com.example.demo.server.model.EmployeeState;
 import lombok.Value;
 import org.springframework.lang.Nullable;
 
+import javax.validation.constraints.NotBlank;
 import java.time.Instant;
 
 @Value
-public class EmployeePayload {
-  Long id;
-  String name;
-  String surname;
+public class EmployeeCreatePayload {
+  @NotBlank String name;
+  @NotBlank String surname;
   @Nullable
   Instant birthDate;
   @Nullable
@@ -19,5 +18,4 @@ public class EmployeePayload {
   String personalPhone;
   @Nullable
   String contractNumber;
-  EmployeeState state;
 }

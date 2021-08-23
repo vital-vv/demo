@@ -1,9 +1,9 @@
 package com.example.demo.processor.configs;
 
-import com.example.avro.EmployeeAvro;
-import com.example.avro.Event;
+import com.example.avro.Action;
+import com.example.avro.EmployeeEvent;
 import com.example.avro.State;
-import com.example.demo.processor.EmployeeAvros;
+import com.example.demo.processor.EmployeeEvents;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,46 +18,46 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 class StateMachineConfigurationTest {
 
   @Autowired
-  private StateMachineFactory<State, Event> factory;
+  private StateMachineFactory<State, Action> factory;
 
   @Test
   void testStateMachine() throws Exception {
-    final EmployeeAvro employee = EmployeeAvros.of(State.ADDED);
-    final StateMachine<State, Event> machine = factory.getStateMachine();
+    final EmployeeEvent employee = EmployeeEvents.of(State.ADDED);
+    final StateMachine<State, Action> machine = factory.getStateMachine();
     machine.getExtendedState().getVariables().put("employee", employee);
 
-    StateMachineTestPlanBuilder<State, Event>.StateMachineTestPlanStepBuilder plan =
-        StateMachineTestPlanBuilder.<State, Event>builder()
+    StateMachineTestPlanBuilder<State, Action>.StateMachineTestPlanStepBuilder plan =
+        StateMachineTestPlanBuilder.<State, Action>builder()
             .stateMachine(machine)
             .step()
             .expectState(State.ADDED);
 
     plan.and()
         .step()
-        .sendEvent(Event.TO_CHECK)
+        .sendEvent(Action.TO_CHECK)
         .expectStateExited(State.ADDED)
         .expectStateEntered(State.IN_CHECK)
         .expectState(State.IN_CHECK);
 
-    expectEventsNotAccepted(plan, State.IN_CHECK, Event.TO_CHECK, Event.ACTIVATE);
+    expectEventsNotAccepted(plan, State.IN_CHECK, Action.TO_CHECK, Action.ACTIVATE);
 
     plan.and()
         .step()
-        .sendEvent(Event.APPROVE)
+        .sendEvent(Action.APPROVE)
         .expectStateExited(State.IN_CHECK)
         .expectStateEntered(State.APPROVED)
         .expectState(State.APPROVED);
 
-    expectEventsNotAccepted(plan, State.APPROVED, Event.TO_CHECK, Event.APPROVE);
+    expectEventsNotAccepted(plan, State.APPROVED, Action.TO_CHECK, Action.APPROVE);
 
     plan.and()
         .step()
-        .sendEvent(Event.ACTIVATE)
+        .sendEvent(Action.ACTIVATE)
         .expectStateExited(State.APPROVED)
         .expectStateEntered(State.ACTIVE)
         .expectState(State.ACTIVE);
 
-    expectEventsNotAccepted(plan, State.ACTIVE, Event.values());
+    expectEventsNotAccepted(plan, State.ACTIVE, Action.values());
 
     plan.and()
         .build()
@@ -65,8 +65,8 @@ class StateMachineConfigurationTest {
   }
 
   private void expectEventsNotAccepted(
-      StateMachineTestPlanBuilder<State, Event>.StateMachineTestPlanStepBuilder plan,
-      State state, Event... events) {
+      StateMachineTestPlanBuilder<State, Action>.StateMachineTestPlanStepBuilder plan,
+      State state, Action... events) {
 
     for (var event : events) {
       plan.and()

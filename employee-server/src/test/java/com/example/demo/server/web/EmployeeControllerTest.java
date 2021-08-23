@@ -1,9 +1,9 @@
 package com.example.demo.server.web;
 
 import com.example.demo.server.EmployeeCreatePayloads;
+import com.example.demo.server.domain.Employee;
 import com.example.demo.server.exception.EmployeeNotFoundException;
-import com.example.demo.server.model.EmployeeState;
-import com.example.demo.server.model.dto.EmployeePayload;
+import com.example.demo.server.model.EmployeePayload;
 import com.example.demo.server.services.EmployeeService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static com.example.demo.server.model.EmployeeEvent.TO_CHECK;
+import static com.example.avro.Action.TO_CHECK;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
@@ -41,7 +41,7 @@ class EmployeeControllerTest {
 
   public EmployeeControllerTest() {
     employee = new EmployeePayload(0L, "Jane", "Fox", Instant.now(),
-        null, null, "C-1", EmployeeState.ADDED);
+        null, null, "C-1", Employee.State.ADDED);
   }
 
   @BeforeEach
@@ -119,14 +119,14 @@ class EmployeeControllerTest {
   @Test
   void testCheckEmployee() throws Exception {
     this.mockMvc.perform(post("/v1/employee/{id}/manage", "1")
-            .param("event", TO_CHECK.name()))
+            .param("action", TO_CHECK.name()))
         .andExpect(status().isOk());
   }
 
   @Test
   void testCheckEmployeeNotFoundById() throws Exception {
     this.mockMvc.perform(post("/v1/employee/{id}/manage", "2")
-            .param("event", TO_CHECK.name()))
+            .param("action", TO_CHECK.name()))
         .andExpect(status().isNotFound());
   }
 }

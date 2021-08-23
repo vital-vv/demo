@@ -1,5 +1,6 @@
 package com.example.demo.server.services;
 
+import com.example.avro.Action;
 import com.example.demo.server.EmployeeCreatePayloads;
 import com.example.demo.server.RandomObjects;
 import com.example.demo.server.configs.JpaAuditingConfiguration;
@@ -7,9 +8,8 @@ import com.example.demo.server.domain.Employee;
 import com.example.demo.server.domain.repo.EmployeeRepository;
 import com.example.demo.server.exception.EmployeeNotFoundException;
 import com.example.demo.server.mapper.EmployeeMapperImpl;
-import com.example.demo.server.model.EmployeeEvent;
-import com.example.demo.server.model.dto.EmployeeCreatePayload;
-import com.example.demo.server.model.dto.EmployeePayload;
+import com.example.demo.server.model.EmployeeCreatePayload;
+import com.example.demo.server.model.EmployeePayload;
 import com.example.demo.server.services.impl.EmployeeServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ class EmployeeServiceTest {
   @Autowired
   private EmployeeRepository repo;
   @MockBean
-  EmployeeSource employeeSource;
+  EmployeeEventSource employeeEventSource;
 
   private List<Employee> employees;
 
@@ -64,7 +64,7 @@ class EmployeeServiceTest {
     assertNull(employee.getState());
     assertEquals(employeePayload.getBirthDate(), employee.getBirthDate());
 
-    verify(employeeSource, times(1)).sendEmployee(any());
+    verify(employeeEventSource, times(1)).send(any());
   }
 
   @Test
@@ -96,12 +96,12 @@ class EmployeeServiceTest {
     final Long id = service.create(EmployeeCreatePayloads.of("John", "Smith"))
         .getId();
 
-    assertThrows(EmployeeNotFoundException.class, () -> service.manage(missingEmployeeId, EmployeeEvent.TO_CHECK));
+    assertThrows(EmployeeNotFoundException.class, () -> service.manage(missingEmployeeId, Action.TO_CHECK));
 
-    for (EmployeeEvent event : EmployeeEvent.values()) {
-      service.manage(id, event);
+    for (Action action : Action.values()) {
+      service.manage(id, action);
     }
 
-    verify(employeeSource, times(EmployeeEvent.values().length)).sendEmployee(any(), any());
+    verify(employeeEventSource, times(Action.values().length)).send(any(), any());
   }
 }

@@ -1,11 +1,10 @@
 package com.example.demo.server.mapper;
 
-import com.example.avro.EmployeeAvro;
+import com.example.avro.Action;
+import com.example.avro.EmployeeEvent;
 import com.example.avro.State;
 import com.example.demo.server.RandomObjects;
 import com.example.demo.server.domain.Employee;
-import com.example.demo.server.model.EmployeeEvent;
-import com.example.demo.server.model.EmployeeState;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,37 +15,37 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-@ContextConfiguration(classes = AvroMapperImpl.class)
+@ContextConfiguration(classes = EmployeeEventMapperImpl.class)
 @ExtendWith(SpringExtension.class)
-class AvroMapperTest {
+class EmployeeEventMapperTest {
 
   @Autowired
-  private AvroMapper mapper;
+  private EmployeeEventMapper mapper;
 
   @Test
   void testCreateEmployeeAvroFromEmployee() {
-    final Employee expected = RandomObjects.employee(EmployeeState.ADDED);
-    EmployeeAvro actual = mapper.map(expected);
+    final Employee expected = RandomObjects.employee(Employee.State.ADDED);
+    EmployeeEvent actual = mapper.map(expected);
 
     assertThat(actual.getId()).isEqualTo(expected.getId());
     assertEquals(expected.getMachineId(), actual.getMachineId());
     assertEquals(expected.getState().name(), actual.getState().name());
-    assertNull(actual.getEvent());
+    assertNull(actual.getAction());
 
-    for (EmployeeEvent event : EmployeeEvent.values()) {
-      actual = mapper.map(expected, event);
+    for (Action action : Action.values()) {
+      actual = mapper.map(expected, action);
 
       assertThat(actual.getId()).isEqualTo(expected.getId());
       assertEquals(expected.getMachineId(), actual.getMachineId());
       assertEquals(expected.getState().name(), actual.getState().name());
-      assertEquals(event.name(), actual.getEvent().name());
+      assertEquals(action.name(), actual.getAction().name());
     }
   }
 
   @Test
   void testCreateEmployeeStateFromState() {
     for (State expected : State.values()) {
-      final EmployeeState actual = mapper.map(expected);
+      final Employee.State actual = mapper.map(expected);
 
       assertEquals(expected.name(), actual.name());
     }

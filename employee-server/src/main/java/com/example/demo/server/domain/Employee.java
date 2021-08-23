@@ -1,6 +1,5 @@
 package com.example.demo.server.domain;
 
-import com.example.demo.server.model.EmployeeState;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,9 +35,13 @@ public class Employee extends AbstractAuditable {
   private String contractNumber;
 
   @Enumerated(EnumType.STRING)
-  private EmployeeState state;
+  private State state;
 
   @NotNull
   @Column(nullable = false, updatable = false)
   private String machineId = UUID.randomUUID().toString();
+
+  public enum State {
+    ADDED, IN_CHECK, APPROVED, ACTIVE
+  }
 }

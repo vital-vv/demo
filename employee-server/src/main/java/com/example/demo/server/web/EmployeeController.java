@@ -1,8 +1,8 @@
 package com.example.demo.server.web;
 
-import com.example.demo.server.model.EmployeeEvent;
-import com.example.demo.server.model.dto.EmployeeCreatePayload;
-import com.example.demo.server.model.dto.EmployeePayload;
+import com.example.avro.Action;
+import com.example.demo.server.model.EmployeeCreatePayload;
+import com.example.demo.server.model.EmployeePayload;
 import com.example.demo.server.services.EmployeeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -51,7 +51,7 @@ public class EmployeeController {
       @ApiResponse(responseCode = "404", description = "Employee not found by id")
   })
   @PostMapping("{id}/manage")
-  public void manage(@PathVariable("id") Long id, @RequestParam("event") EmployeeEvent event) {
-    service.manage(id, event);
+  public void manage(@PathVariable("id") Long id, @RequestParam("action") Action action) {
+    service.manage(id, action);
   }
 }

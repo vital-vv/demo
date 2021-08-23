@@ -2,8 +2,8 @@ package com.example.demo.server.mapper;
 
 import com.example.demo.server.RandomObjects;
 import com.example.demo.server.domain.Employee;
-import com.example.demo.server.model.dto.EmployeeCreatePayload;
-import com.example.demo.server.model.dto.EmployeePayload;
+import com.example.demo.server.model.EmployeeCreatePayload;
+import com.example.demo.server.model.EmployeePayload;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

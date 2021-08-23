@@ -22,11 +22,11 @@ spring:
         supplier-out-0:
           destination: employee-topic
           producer:
-            useNativeEncoding: true
+            use-native-encoding: true
         consumer-in-0:
           destination: update-employee-topic
           consumer:
-            useNativeDecoding: true
+            use-native-decoding: true
       kafka:
         binder:
           brokers: ${BROKER:localhost}

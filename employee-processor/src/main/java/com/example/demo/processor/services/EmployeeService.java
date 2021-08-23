@@ -1,10 +1,10 @@
 package com.example.demo.processor.services;
 
-import com.example.avro.EmployeeAvro;
+import com.example.avro.EmployeeEvent;
 
 public interface EmployeeService {
 
-  EmployeeAvro create(EmployeeAvro employeePayload);
+  EmployeeEvent create(EmployeeEvent employeePayload);
 
-  EmployeeAvro manage(EmployeeAvro employeePayload);
+  EmployeeEvent manage(EmployeeEvent employeePayload);
 }

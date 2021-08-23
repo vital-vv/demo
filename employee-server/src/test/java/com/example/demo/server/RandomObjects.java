@@ -1,8 +1,7 @@
 package com.example.demo.server;
 
 import com.example.demo.server.domain.Employee;
-import com.example.demo.server.model.EmployeeState;
-import com.example.demo.server.model.dto.EmployeeCreatePayload;
+import com.example.demo.server.model.EmployeeCreatePayload;
 
 import java.time.Instant;
 import java.util.Random;
@@ -25,7 +24,7 @@ public class RandomObjects {
     return employee;
   }
 
-  public static Employee employee(EmployeeState state) {
+  public static Employee employee(Employee.State state) {
     final Employee employee = employee();
     employee.setState(state);
     return employee;

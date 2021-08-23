@@ -1,7 +1,7 @@
 package com.example.demo.processor.services.impl;
 
-import com.example.avro.EmployeeAvro;
-import com.example.avro.Event;
+import com.example.avro.Action;
+import com.example.avro.EmployeeEvent;
 import com.example.avro.State;
 import com.example.demo.processor.exception.UnexpectedEmployeeStateException;
 import com.example.demo.processor.services.EmployeeService;
@@ -26,27 +26,27 @@ public class EmployeeServiceImpl implements EmployeeService {
   private final StateMachineHelper machineHelper;
 
   @Override
-  public EmployeeAvro create(EmployeeAvro payload) {
-    log.debug("Create a state machine for employee: {}", payload);
+  public EmployeeEvent create(EmployeeEvent event) {
+    log.debug("Create a state machine for employee: {}", event);
 
-    StateMachine<State, Event> machine = machineHelper.createMachine(payload);
+    StateMachine<State, Action> machine = machineHelper.createMachine(event);
 
     return machineHelper.saveMachine(machine);
   }
 
   @Override
-  public EmployeeAvro manage(EmployeeAvro payload) {
-    log.debug("Send en event for employee state machine: {}", payload);
+  public EmployeeEvent manage(EmployeeEvent employeeEvent) {
+    log.debug("Send en event for employee state machine: {}", employeeEvent);
 
-    StateMachine<State, Event> machine = machineHelper.getMachine(payload);
-    Message<Event> message = MessageBuilder.withPayload(payload.getEvent()).build();
-    Mono<Message<Event>> event = Mono.just(message);
+    StateMachine<State, Action> machine = machineHelper.getMachine(employeeEvent);
+    Message<Action> message = MessageBuilder.withPayload(employeeEvent.getAction()).build();
+    Mono<Message<Action>> event = Mono.just(message);
 
     machine.sendEvent(event)
         .map(StateMachineEventResult::getResultType)
         .filter(result -> result == StateMachineEventResult.ResultType.DENIED)
         .doOnNext(result -> {
-          throw new UnexpectedEmployeeStateException(payload);
+          throw new UnexpectedEmployeeStateException(employeeEvent);
         })
         .blockLast();
 
@@ -54,9 +54,9 @@ public class EmployeeServiceImpl implements EmployeeService {
   }
 
   @Bean
-  public Function<EmployeeAvro, EmployeeAvro> process() {
+  public Function<EmployeeEvent, EmployeeEvent> process() {
     return employee -> {
-      if (employee.getEvent() == null) {
+      if (employee.getAction() == null) {
         return create(employee);
       } else {
         return manage(employee);

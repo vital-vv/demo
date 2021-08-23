@@ -1,6 +1,6 @@
 package com.example.demo.server;
 
-import com.example.demo.server.model.dto.EmployeeCreatePayload;
+import com.example.demo.server.model.EmployeeCreatePayload;
 
 import java.time.Instant;
 

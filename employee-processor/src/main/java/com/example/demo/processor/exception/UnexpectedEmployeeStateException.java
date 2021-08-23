@@ -1,9 +1,9 @@
 package com.example.demo.processor.exception;
 
-import com.example.avro.EmployeeAvro;
+import com.example.avro.EmployeeEvent;
 
 public class UnexpectedEmployeeStateException extends RuntimeException {
-  public UnexpectedEmployeeStateException(EmployeeAvro employeeAvro) {
-    super("Current state of the employee is not supported by the provided event: " + employeeAvro);
+  public UnexpectedEmployeeStateException(EmployeeEvent event) {
+    super("Current state of the employee is not supported by the provided event: " + event);
   }
 }

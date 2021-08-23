@@ -1,11 +1,12 @@
 package com.example.demo.processor.services;
 
-import com.example.avro.EmployeeAvro;
-import com.example.avro.Event;
+import com.example.avro.Action;
+import com.example.avro.EmployeeEvent;
 import com.example.avro.State;
-import com.example.demo.processor.EmployeeAvros;
+import com.example.demo.processor.EmployeeEvents;
 import com.example.demo.processor.StateMachineTestConfiguration;
 import com.example.demo.processor.exception.StateMachineCompletedException;
+import com.example.demo.processor.exception.StateMachineNotFound;
 import com.example.demo.processor.exception.UnexpectedEmployeeStateException;
 import com.example.demo.processor.services.impl.EmployeeServiceImpl;
 import org.junit.jupiter.api.Test;
@@ -25,48 +26,50 @@ class EmployeeServiceTest {
 
   @Test
   void testEmployeeEvents() {
-    EmployeeAvro expected = EmployeeAvros.empty();
-    EmployeeAvro actual = employeeService.create(expected);
+    assertThrows(StateMachineNotFound.class, () -> employeeService.manage(EmployeeEvents.empty()));
+
+    EmployeeEvent expected = EmployeeEvents.empty();
+    EmployeeEvent actual = employeeService.create(expected);
 
     assertEquals(expected.getId(), actual.getId());
     assertEquals(expected.getMachineId(), actual.getMachineId());
     assertEquals(State.ADDED, actual.getState());
 
-    expected = EmployeeAvros.of(State.ADDED, Event.TO_CHECK);
+    expected = EmployeeEvents.of(State.ADDED, Action.TO_CHECK);
     actual = employeeService.manage(expected);
 
     assertEquals(expected.getId(), actual.getId());
     assertEquals(expected.getMachineId(), actual.getMachineId());
     assertEquals(State.IN_CHECK, actual.getState());
-    assertEquals(Event.TO_CHECK, actual.getEvent());
-    assertThrowsOnEvents(expected, Event.TO_CHECK, Event.ACTIVATE);
+    assertEquals(Action.TO_CHECK, actual.getAction());
+    assertThrowsOnEvents(expected, Action.TO_CHECK, Action.ACTIVATE);
 
-    expected = EmployeeAvros.of(State.IN_CHECK, Event.APPROVE);
+    expected = EmployeeEvents.of(State.IN_CHECK, Action.APPROVE);
     actual = employeeService.manage(expected);
 
     assertEquals(expected.getId(), actual.getId());
     assertEquals(expected.getMachineId(), actual.getMachineId());
     assertEquals(State.APPROVED, actual.getState());
-    assertEquals(Event.APPROVE, actual.getEvent());
-    assertThrowsOnEvents(expected, Event.TO_CHECK, Event.APPROVE);
+    assertEquals(Action.APPROVE, actual.getAction());
+    assertThrowsOnEvents(expected, Action.TO_CHECK, Action.APPROVE);
 
-    expected = EmployeeAvros.of(State.APPROVED, Event.ACTIVATE);
+    expected = EmployeeEvents.of(State.APPROVED, Action.ACTIVATE);
     actual = employeeService.manage(expected);
 
     assertEquals(expected.getId(), actual.getId());
     assertEquals(expected.getMachineId(), actual.getMachineId());
     assertEquals(State.ACTIVE, actual.getState());
-    assertEquals(Event.ACTIVATE, actual.getEvent());
-    assertThrowsOnEvents(expected, StateMachineCompletedException.class, Event.TO_CHECK, Event.APPROVE, Event.ACTIVATE);
+    assertEquals(Action.ACTIVATE, actual.getAction());
+    assertThrowsOnEvents(expected, StateMachineCompletedException.class, Action.TO_CHECK, Action.APPROVE, Action.ACTIVATE);
   }
 
-  private void assertThrowsOnEvents(EmployeeAvro avro, Event... events) {
+  private void assertThrowsOnEvents(EmployeeEvent avro, Action... events) {
     assertThrowsOnEvents(avro, UnexpectedEmployeeStateException.class, events);
   }
 
-  private void assertThrowsOnEvents(EmployeeAvro avro, Class<? extends Throwable> expectedType, Event... events) {
-    for (Event event : events) {
-      EmployeeAvro expected = EmployeeAvros.of(avro.getState(), event);
+  private void assertThrowsOnEvents(EmployeeEvent avro, Class<? extends Throwable> expectedType, Action... actions) {
+    for (Action action : actions) {
+      EmployeeEvent expected = EmployeeEvents.of(avro.getState(), action);
       assertThrows(expectedType, () -> employeeService.manage(expected));
     }
   }

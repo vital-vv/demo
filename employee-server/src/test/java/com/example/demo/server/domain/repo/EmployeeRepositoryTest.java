@@ -4,7 +4,6 @@ import com.example.demo.server.Employees;
 import com.example.demo.server.RandomObjects;
 import com.example.demo.server.configs.JpaAuditingConfiguration;
 import com.example.demo.server.domain.Employee;
-import com.example.demo.server.model.EmployeeState;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -54,7 +53,7 @@ class EmployeeRepositoryTest {
 
   @Test
   void testSetEmployeeStateById() {
-    final EmployeeState expected = EmployeeState.IN_CHECK;
+    final Employee.State expected = Employee.State.IN_CHECK;
     final Long missingEmployeeId = -1L;
 
     int count = repository.setEmployeeStateById(missingEmployeeId, expected);

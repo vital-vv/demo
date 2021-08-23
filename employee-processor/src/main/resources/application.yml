@@ -20,11 +20,11 @@ spring:
         process-in-0:
           destination: employee-topic
           consumer:
-            useNativeDecoding: true
+            use-native-decoding: true
         process-out-0:
           destination: update-employee-topic
           producer:
-            useNativeEncoding: true
+            use-native-encoding: true
       kafka:
         binder:
           brokers: ${BROKER:localhost}
@@ -49,6 +49,3 @@ management:
 
 logging.level:
   com.example.demo: DEBUG
-
-server:
-  port: 8082

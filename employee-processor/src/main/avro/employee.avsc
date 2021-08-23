@@ -1,7 +1,7 @@
 {
   "namespace": "com.example.avro",
   "type": "record",
-  "name": "EmployeeAvro",
+  "name": "EmployeeEvent",
   "fields": [
     {
       "name": "id",
@@ -29,11 +29,11 @@
       "default": null
     },
     {
-      "name": "event",
+      "name": "action",
       "type": [
         "null",
         {
-          "name": "Event",
+          "name": "Action",
           "type": "enum",
           "symbols": [
             "TO_CHECK",
