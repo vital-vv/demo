@@ -46,6 +46,14 @@ dependencies {
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
   testImplementation "org.testcontainers:testcontainers"
   testImplementation "org.testcontainers:postgresql"
+  testImplementation('org.springframework.cloud:spring-cloud-stream') {
+    artifact {
+      name = 'spring-cloud-stream'
+      extension = 'jar'
+      type = 'test-jar'
+      classifier = 'test-binder'
+    }
+  }
 }
 
 dependencyManagement {

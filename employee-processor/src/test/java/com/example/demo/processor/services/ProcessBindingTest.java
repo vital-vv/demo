@@ -13,9 +13,11 @@ import org.springframework.cloud.stream.binder.test.OutputDestination;
 import org.springframework.cloud.stream.binder.test.TestChannelBinderConfiguration;
 import org.springframework.context.annotation.Import;
 import org.springframework.messaging.support.GenericMessage;
+import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ActiveProfiles("h2")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Import(TestChannelBinderConfiguration.class)
 public class ProcessBindingTest {
@@ -53,8 +55,8 @@ public class ProcessBindingTest {
   }
 
   private EmployeeEvent sendEvent(EmployeeEvent event) {
-    input.send(new GenericMessage<>(event));
-    Object payload = output.receive(100, "process-out-0").getPayload();
+    input.send(new GenericMessage<>(event), "employee-topic");
+    Object payload = output.receive(2000, "update-employee-topic").getPayload();
     return (EmployeeEvent) payload;
   }
 }

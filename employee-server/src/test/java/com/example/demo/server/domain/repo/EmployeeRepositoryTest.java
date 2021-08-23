@@ -49,6 +49,8 @@ class EmployeeRepositoryTest {
     assertEquals(expectEmployee.getName(), actualEmployee.getName());
     assertEquals(expectEmployee.getSurname(), actualEmployee.getSurname());
     assertEquals(expectEmployee.getMachineId(), actualEmployee.getMachineId());
+
+    assertDoesNotThrow(() -> repository.deleteAll());
   }
 
   @Test
@@ -63,6 +65,8 @@ class EmployeeRepositoryTest {
     final Long employeeId = employee.getId();
     assertNotNull(employeeId);
     assertEquals(1, repository.setEmployeeStateById(employeeId, expected));
+
+    assertDoesNotThrow(() -> repository.deleteAll());
   }
 
   private void assertSysFieldsNotNull(Employee employee) {

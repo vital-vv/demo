@@ -1,6 +1,7 @@
 package com.example.demo.server.configs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.cloud.schema.registry.client.ConfluentSchemaRegistryClient;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(SchemaRegistryClientProperties.class)
 public class SchemaRegistryClientConfiguration {
 
+  @ConditionalOnMissingBean(io.confluent.kafka.schemaregistry.client.SchemaRegistryClient.class)
   @Bean
   public SchemaRegistryClient schemaRegistryClient(SchemaRegistryClientProperties properties,
                                                    RestTemplateBuilder restTemplateBuilder,
